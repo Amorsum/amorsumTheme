@@ -6,6 +6,8 @@
  */
 ?>
 
+</main><!-- .app__main -->
+
 <footer class="footer">
     <div class="footer__inner container">
 

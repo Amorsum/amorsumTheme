@@ -6,15 +6,24 @@
  */
 ?>
 <!DOCTYPE html>
-<html lang="<?php language_attributes(); ?>" data-theme="<?php echo esc_attr(amorsum_theme('theme_mode', 'dark')); ?>">
+<html <?php language_attributes(); ?> data-theme="<?php echo esc_attr(amorsum_theme('theme_mode', 'dark')); ?>">
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 防止主题闪烁：在 CSS 加载前立即应用用户主题偏好 -->
+    <script>
+    (function(){var t=localStorage.getItem('amorsum-theme');if(!t){var a=document.documentElement.getAttribute('data-theme');if(a==='auto'){t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else{t=a||'dark'}}if(t==='auto'){t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.setAttribute('data-theme',t)})()
+    </script>
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
 
 <?php wp_body_open(); ?>
+
+<!-- 跳过导航链接（可访问性） -->
+<a class="skip-link screen-reader-text" href="#main-content">
+    <?php esc_html_e('跳至主内容', 'amorsum'); ?>
+</a>
 
 <!-- 背景装饰 -->
 <div class="bg-decor">
@@ -116,3 +125,5 @@
         ?>
     </div>
 </header>
+
+<main id="main-content" class="app__main">
