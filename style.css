@@ -488,49 +488,174 @@ button {
 [data-theme="light"] .header__action-btn .ph-moon-stars,
 [data-theme="light"] .ph-moon-stars { display: inline; }
 
-/* 搜索弹出层 */
-.header__search-overlay {
-  position: fixed;
-  top: 0;
+/* 搜索下拉面板 */
+.header__search-panel {
+  position: absolute;
+  top: 100%;
   left: 0;
   width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(8px);
-  z-index: 200;
-  display: none;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 20vh;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  z-index: 99;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s ease;
 }
 
-.header__search-overlay.is-open {
+.header__search-panel.is-open {
+  max-height: 80vh;
+  padding: 24px 0;
+  overflow-y: auto;
+}
+
+/* 面板内搜索输入行 */
+.header__search-form {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0 16px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.header__search-box {
-  width: 90%;
-  max-width: 600px;
+.header__search-form:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--accent-glow);
 }
 
-.header__search-close {
-  position: absolute;
-  top: 24px;
-  right: 24px;
+.header__search-icon {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.header__search-input {
+  flex: 1;
+  padding: 16px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.header__search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.header__search-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+/* 搜索结果容器 */
+.search-results {
+  margin-top: 16px;
+}
+
+.search-results__loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.search-results__spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.search-results__empty {
+  text-align: center;
+  padding: 32px 16px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  font-size: 1.5rem;
-  color: var(--text-secondary);
-  border-radius: 50%;
-  transition: all var(--transition-fast);
+  gap: 8px;
 }
 
-.header__search-close:hover {
+/* 搜索结果条目 */
+.search-results__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
   color: var(--text-primary);
-  background: rgba(255,255,255,0.1);
+  transition: background var(--transition-fast);
+}
+
+.search-results__item:hover {
+  background: var(--accent-soft);
+}
+
+.search-results__title {
+  font-size: var(--text-base);
+  font-weight: 500;
+  flex-shrink: 0;
+  max-width: 55%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-results__date {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.search-results__snippet {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+/* 关键词高亮 */
+.search-results__mark {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* 底部提示：按 Enter 查看全部 */
+.search-results__enter-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 0 4px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
 }
 
 /* 移动端菜单 */

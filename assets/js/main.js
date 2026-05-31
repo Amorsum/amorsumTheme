@@ -72,36 +72,141 @@
   }
 
   // ============================================
-  // 3. 搜索弹出层
+  // 3. 实时搜索
   // ============================================
-  const searchBtn = document.getElementById('searchBtn');
-  const searchOverlay = document.getElementById('searchOverlay');
-  const searchClose = document.getElementById('searchClose');
+  const searchBtn    = document.getElementById('searchBtn');
+  const searchPanel  = document.getElementById('searchPanel');
+  const searchInput  = document.getElementById('liveSearchInput');
+  const searchResults = document.getElementById('searchResults');
+
+  let searchTimer = null;
+  let searchAbort = null;
+
+  // 开关面板
+  function openSearchPanel() {
+    searchPanel?.classList.add('is-open');
+    document.body.classList.add('search-is-open');
+    setTimeout(() => searchInput?.focus(), 150);
+  }
+  function closeSearchPanel() {
+    searchPanel?.classList.remove('is-open');
+    document.body.classList.remove('search-is-open');
+    if (searchInput) searchInput.value = '';
+    clearResults();
+  }
+  function clearResults() {
+    if (searchResults) searchResults.innerHTML = '';
+    if (searchTimer) clearTimeout(searchTimer);
+    if (searchAbort) { searchAbort.abort(); searchAbort = null; }
+  }
 
   searchBtn?.addEventListener('click', () => {
-    searchOverlay?.classList.add('is-open');
-    // 聚焦搜索框
-    setTimeout(() => {
-      const input = searchOverlay?.querySelector('input[type="search"]');
-      input?.focus();
-    }, 100);
-  });
-
-  searchClose?.addEventListener('click', () => {
-    searchOverlay?.classList.remove('is-open');
-  });
-
-  // ESC 关闭
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && searchOverlay?.classList.contains('is-open')) {
-      searchOverlay.classList.remove('is-open');
+    if (searchPanel?.classList.contains('is-open')) {
+      closeSearchPanel();
+    } else {
+      openSearchPanel();
     }
   });
 
-  // 点击遮罩关闭
-  searchOverlay?.addEventListener('click', (e) => {
-    if (e.target === searchOverlay) {
-      searchOverlay.classList.remove('is-open');
+  // 输入关键词 → 防抖 300ms 后发起 AJAX 搜索
+  searchInput?.addEventListener('input', function () {
+    const q = this.value.trim();
+    if (searchTimer) clearTimeout(searchTimer);
+    if (searchAbort) { searchAbort.abort(); searchAbort = null; }
+
+    if (q.length < 2) {
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    searchResults.innerHTML = '<div class="search-results__loading"><span class="search-results__spinner"></span></div>';
+
+    searchTimer = setTimeout(() => {
+      searchAbort = new AbortController();
+      const url = (typeof amorsumAjax !== 'undefined' && amorsumAjax.ajaxurl
+        ? amorsumAjax.ajaxurl
+        : '/wp-admin/admin-ajax.php')
+        + '?action=amorsum_live_search&_wpnonce='
+        + (typeof amorsumAjax !== 'undefined' ? amorsumAjax.nonce : '')
+        + '&q=' + encodeURIComponent(q);
+
+      fetch(url, { signal: searchAbort.signal })
+        .then(r => r.json())
+        .then(res => {
+          if (!res.success || !res.data) return;
+          renderResults(res.data.results, res.data.query);
+        })
+        .catch(err => {
+          if (err.name !== 'AbortError') {
+            searchResults.innerHTML = '<div class="search-results__empty">搜索出错了，请重试</div>';
+          }
+        });
+    }, 300);
+  });
+
+  // 渲染结果列表
+  function renderResults(results, query) {
+    if (!searchResults) return;
+
+    if (!results || results.length === 0) {
+      searchResults.innerHTML = '<div class="search-results__empty"><i class="ph ph-smiley-sad"></i> 未找到相关内容</div>';
+      return;
+    }
+
+    let html = '';
+    results.forEach(r => {
+      const suffix = r.in_title
+        ? '<span class="search-results__date">' + escapeHtml(r.date) + '</span>'
+        : '<span class="search-results__snippet">' + escapeHtml(r.excerpt) + '</span>';
+
+      html += '<a href="' + escapeAttr(r.url) + '" class="search-results__item">'
+        + '<span class="search-results__title">' + highlightKeyword(r.title, query) + '</span>'
+        + suffix
+        + '</a>';
+    });
+
+    html += '<div class="search-results__enter-hint"><i class="ph ph-arrow-right"></i> 按 Enter 查看全部搜索结果</div>';
+    searchResults.innerHTML = html;
+  }
+
+  // 关键词高亮
+  function highlightKeyword(text, keyword) {
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp('(' + escaped + ')', 'gi');
+    return text.replace(regex, '<mark class="search-results__mark">$1</mark>');
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+  function escapeAttr(str) {
+    return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ESC 关闭
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && searchPanel?.classList.contains('is-open')) {
+      closeSearchPanel();
+      searchBtn?.focus();
+    }
+  });
+
+  // 点击面板外部关闭
+  document.addEventListener('click', e => {
+    if (searchPanel?.classList.contains('is-open')
+        && !searchPanel.contains(e.target)
+        && e.target !== searchBtn
+        && !searchBtn?.contains(e.target)) {
+      closeSearchPanel();
+    }
+  });
+
+  // 点击结果项 → 关闭面板
+  searchResults?.addEventListener('click', e => {
+    if (e.target.closest('.search-results__item')) {
+      closeSearchPanel();
     }
   });
 

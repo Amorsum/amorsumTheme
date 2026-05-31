@@ -514,6 +514,68 @@ function amorsum_save_theme_preference() {
 add_action('wp_ajax_amorsum_save_theme', 'amorsum_save_theme_preference');
 add_action('wp_ajax_nopriv_amorsum_save_theme', 'amorsum_save_theme_preference');
 
+// ============================================
+// 10. AJAX: 实时搜索
+// ============================================
+function amorsum_live_search() {
+    check_ajax_referer('amorsum_theme_nonce', '_wpnonce');
+
+    $query = sanitize_text_field($_GET['q'] ?? '');
+    if (mb_strlen($query) < 2) {
+        wp_send_json_success(['results' => [], 'query' => $query]);
+    }
+
+    $search = new WP_Query([
+        'post_type'      => 'post',
+        'post_status'    => 'publish',
+        'posts_per_page' => 8,
+        's'              => $query,
+        'orderby'        => 'relevance',
+    ]);
+
+    $results = [];
+    if ($search->have_posts()) {
+        while ($search->have_posts()) {
+            $search->the_post();
+            $title   = get_the_title();
+            $content = wp_strip_all_tags(get_the_content());
+            $url     = get_permalink();
+            $date    = get_the_date('Y-m-d');
+
+            // 判断关键词是否在标题中
+            $in_title = (mb_stripos($title, $query) !== false);
+
+            // 如果关键词不在标题中，提取内容中的上下文
+            $excerpt = '';
+            if (!$in_title) {
+                $pos = mb_stripos($content, $query);
+                if ($pos !== false) {
+                    $start  = max(0, $pos - 35);
+                    $length = mb_strlen($query) + 70;
+                    $snippet = mb_substr($content, $start, $length);
+                    // 清理：截断到最近的完整字符边界
+                    if ($start > 0) $snippet = '…' . $snippet;
+                    if (($start + $length) < mb_strlen($content)) $snippet .= '…';
+                    $excerpt = $snippet;
+                }
+            }
+
+            $results[] = [
+                'title'    => $title,
+                'url'      => $url,
+                'date'     => $date,
+                'in_title' => $in_title,
+                'excerpt'  => $excerpt,
+            ];
+        }
+        wp_reset_postdata();
+    }
+
+    wp_send_json_success(compact('results', 'query'));
+}
+add_action('wp_ajax_amorsum_live_search', 'amorsum_live_search');
+add_action('wp_ajax_nopriv_amorsum_live_search', 'amorsum_live_search');
+
 // 本地化 AJAX URL 和 nonce
 function amorsum_localize_script() {
     wp_localize_script('amorsum-main', 'amorsumAjax', [

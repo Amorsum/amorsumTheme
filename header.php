@@ -89,16 +89,6 @@
                 <i class="ph ph-magnifying-glass"></i>
             </button>
 
-            <!-- 搜索弹出层 -->
-            <div class="header__search-overlay" id="searchOverlay">
-                <div class="header__search-box">
-                    <?php get_search_form(); ?>
-                </div>
-                <button class="header__search-close" id="searchClose">
-                    <i class="ph ph-x"></i>
-                </button>
-            </div>
-
             <!-- 主题切换 -->
             <button class="header__action-btn" aria-label="<?php esc_attr_e('切换主题', 'amorsum'); ?>" id="themeToggle">
                 <i class="ph ph-sun-dim"></i>
@@ -127,6 +117,26 @@
             ]);
         }
         ?>
+    </div>
+
+    <!-- 搜索下拉面板 -->
+    <div class="header__search-panel" id="searchPanel">
+        <div class="container">
+            <form class="header__search-form" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>" autocomplete="off">
+                <i class="ph ph-magnifying-glass header__search-icon"></i>
+                <input
+                    type="search"
+                    id="liveSearchInput"
+                    name="s"
+                    class="header__search-input"
+                    placeholder="<?php esc_attr_e('输入关键词搜索文章...', 'amorsum'); ?>"
+                    autocomplete="off"
+                />
+                <span class="header__search-hint">Esc <?php esc_html_e('关闭', 'amorsum'); ?></span>
+            </form>
+            <!-- 实时搜索结果 -->
+            <div class="search-results" id="searchResults"></div>
+        </div>
     </div>
 </header>
 
