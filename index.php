@@ -27,11 +27,13 @@ $home_layout = amorsum_theme('home_layout', 'hero');
             </h1>
             <p class="hero__subtitle"><?php echo esc_html(amorsum_theme('hero_subtitle', '')); ?></p>
             <div class="hero__actions">
-                <a href="<?php echo esc_url(home_url('/archives')); ?>" class="hero__btn hero__btn--primary">
+                <?php $archives_page = get_page_by_path('archives'); ?>
+                <a href="<?php echo esc_url($archives_page ? get_permalink($archives_page) : home_url('/archives')); ?>" class="hero__btn hero__btn--primary">
                     <span><?php esc_html_e('浏览文章', 'amorsum'); ?></span>
                     <i class="ph ph-arrow-right"></i>
                 </a>
-                <a href="<?php echo esc_url(home_url('/about')); ?>" class="hero__btn hero__btn--ghost">
+                <?php $about_page = get_page_by_path('about'); ?>
+                <a href="<?php echo esc_url($about_page ? get_permalink($about_page) : home_url('/about')); ?>" class="hero__btn hero__btn--ghost">
                     <span><?php esc_html_e('关于我', 'amorsum'); ?></span>
                 </a>
             </div>

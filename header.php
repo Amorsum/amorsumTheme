@@ -61,17 +61,21 @@
                     'walker'         => new Amorsum_Nav_Walker(),
                 ]);
             } else {
-                // 默认菜单
+                // 默认菜单 — 通过页面别名动态获取链接，兼容所有固定链接格式
                 echo '<ul class="header__nav-list">';
-                $defaults = [
-                    '首页' => home_url('/'),
-                    '归档' => home_url('/archives'),
-                    '分类' => home_url('/categories'),
-                    '关于' => home_url('/about'),
+                // 首页
+                echo '<li><a href="' . esc_url(home_url('/')) . '" class="header__nav-link' . (is_front_page() ? ' active' : '') . '"><span>' . esc_html__('首页', 'amorsum') . '</span></a></li>';
+                // 归档/分类/关于 — 通过 slug 查找页面，自动适配 /index.php/archives/ 等格式
+                $nav_pages = [
+                    'archives'   => esc_html__('归档', 'amorsum'),
+                    'categories' => esc_html__('分类', 'amorsum'),
+                    'about'      => esc_html__('关于', 'amorsum'),
                 ];
-                foreach ($defaults as $name => $url) {
-                    $active = (is_home() && $name === '首页') || (is_page($name)) ? ' active' : '';
-                    echo '<li><a href="' . esc_url($url) . '" class="header__nav-link' . $active . '"><span>' . esc_html($name) . '</span></a></li>';
+                foreach ($nav_pages as $slug => $label) {
+                    $page = get_page_by_path($slug);
+                    $url  = $page ? get_permalink($page) : home_url('/' . $slug);
+                    $active = is_page($slug) ? ' active' : '';
+                    echo '<li><a href="' . esc_url($url) . '" class="header__nav-link' . $active . '"><span>' . $label . '</span></a></li>';
                 }
                 echo '</ul>';
             }
