@@ -30,7 +30,7 @@
 
 <?php if (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
 <!-- 背景动态视频 -->
-<video class="bg-video" autoplay muted loop playsinline disablePictureInPicture preload="metadata" data-src="<?php echo esc_url(amorsum_theme('bg_video_url')); ?>">
+<video class="bg-video" autoplay muted loop playsinline webkit-playsinline disablePictureInPicture disableRemotePlayback preload="metadata" x5-video-player-type="h5" x5-video-player-fullscreen="false" x5-video-orientation="portraint" x-webkit-airplay="deny" data-src="<?php echo esc_url(amorsum_theme('bg_video_url')); ?>">
     <source src="<?php echo esc_url(amorsum_theme('bg_video_url')); ?>" type="video/mp4">
 </video>
 <!-- 视频叠加层（保证文字可读性） -->
