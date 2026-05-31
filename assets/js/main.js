@@ -418,11 +418,10 @@
       let rafId = null;
       let running = false;
 
-      // 调整 Canvas 内部分辨率
+      // Canvas 分辨率与视口严格对齐，避免画面变形
       function resize() {
-        const dpr = window.innerWidth <= 768 ? 0.75 : 1;
-        bgCanvas.width  = window.innerWidth * dpr;
-        bgCanvas.height = window.innerHeight * dpr;
+        bgCanvas.width  = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
       }
 
       function draw() {
