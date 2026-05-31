@@ -40,7 +40,7 @@ $home_layout = amorsum_theme('home_layout', 'hero');
 
             <!-- 打字机多项文本 -->
             <?php
-            $hero_title = amorsum_theme('hero_title', '');
+            $hero_title = amorsum_theme('hero_title', '["Hello, World.", "Welcome to Amorsum."]');
             $titles = json_decode($hero_title, true);
             if (is_array($titles) && count($titles) > 1):
             ?>
