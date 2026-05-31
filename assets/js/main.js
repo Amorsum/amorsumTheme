@@ -403,31 +403,45 @@
   });
 
   // ============================================
-  // 12. 背景视频处理
+  // 12. 背景视频处理（延迟加载，避免阻塞关键渲染）
   // ============================================
   const bgVideo = document.querySelector('.bg-video');
 
   if (bgVideo) {
-    // 尝试播放（部分浏览器阻止不带用户交互的 autoplay）
-    const playPromise = bgVideo.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // autoplay 被阻止，静默降级为纯色背景
-        document.body.classList.add('bg-video-fallback');
+    bgVideo.style.opacity = '0';
+    bgVideo.style.transition = 'opacity 1.5s ease';
+
+    // 等待页面完全加载后再加载视频，避免和关键资源抢带宽
+    function initBgVideo() {
+      // preload="metadata" 只加载了头部信息，这里触发完整播放
+      bgVideo.load();
+      const playPromise = bgVideo.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          document.body.classList.add('bg-video-fallback');
+        });
+      }
+    }
+
+    // 页面加载完成后再启动视频
+    if (document.readyState === 'complete') {
+      // 已经加载完了，稍微延迟避免立即抢带宽
+      setTimeout(initBgVideo, 500);
+    } else {
+      window.addEventListener('load', () => {
+        setTimeout(initBgVideo, 500);
       });
     }
+
+    // 视频元数据就绪后淡入
+    bgVideo.addEventListener('loadeddata', () => {
+      bgVideo.style.opacity = '1';
+    });
 
     // 视频加载失败降级
     bgVideo.addEventListener('error', () => {
       document.body.classList.add('bg-video-fallback');
     });
-
-    // 视频成功加载后轻微淡入
-    bgVideo.addEventListener('loadeddata', () => {
-      bgVideo.style.opacity = '1';
-    });
-    bgVideo.style.transition = 'opacity 1.5s ease';
-    bgVideo.style.opacity = '0';
   }
 
   // 开发环境日志（生产环境可删除此行）
