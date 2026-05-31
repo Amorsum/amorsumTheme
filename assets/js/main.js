@@ -165,7 +165,6 @@
         + '</a>';
     });
 
-    html += '<div class="search-results__enter-hint"><i class="ph ph-arrow-right"></i> 按 Enter 查看全部搜索结果</div>';
     searchResults.innerHTML = html;
   }
 

@@ -144,7 +144,6 @@
                     placeholder="<?php esc_attr_e('输入关键词搜索文章...', 'amorsum'); ?>"
                     autocomplete="off"
                 />
-                <span class="header__search-hint">Esc <?php esc_html_e('关闭', 'amorsum'); ?></span>
             </form>
             <!-- 实时搜索结果 -->
             <div class="search-results" id="searchResults"></div>
