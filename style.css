@@ -99,16 +99,17 @@ Tags: blog, dark-mode, responsive, glassmorphism, modern, two-columns, custom-co
   --accent-hover: #5a38d0;
   --accent-soft: rgba(108, 76, 224, 0.08);
 
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-hover-bg: rgba(255, 255, 255, 0.9);
+  /* 大幅降低不透明度，让壁纸透过来 */
+  --glass-bg: rgba(255, 255, 255, 0.18);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-hover-bg: rgba(255, 255, 255, 0.35);
 
-  --border: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(0, 0, 0, 0.14);
+  --border: rgba(0, 0, 0, 0.06);
+  --border-hover: rgba(0, 0, 0, 0.12);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 /* -------------------------------
@@ -321,7 +322,7 @@ button {
   background: rgba(8, 8, 15, var(--video-overlay-opacity, 0.6));
 }
 [data-theme="light"] .bg-video-overlay {
-  background: rgba(248, 248, 252, var(--video-overlay-opacity, 0.55));
+  background: rgba(248, 248, 252, var(--video-overlay-opacity, 0.3));
 }
 
 /* 启用视频时移除 body 纯色背景 */
