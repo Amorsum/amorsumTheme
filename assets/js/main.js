@@ -403,48 +403,93 @@
   });
 
   // ============================================
-  // 12. 背景视频处理（延迟加载，避免阻塞关键渲染）
+  // 12. 背景视频 → Canvas 渲染
+  // 不往 DOM 里放 <video>，浏览器就不会劫持/投屏/弹控件
   // ============================================
-  const bgVideo = document.querySelector('.bg-video');
+  const bgCanvas = document.getElementById('bgCanvas');
 
-  if (bgVideo) {
-    bgVideo.style.opacity = '0';
-    bgVideo.style.transition = 'opacity 1.5s ease';
+  if (bgCanvas) {
+    const videoSrc = bgCanvas.getAttribute('data-src');
+    if (!videoSrc) {
+      document.body.classList.add('bg-video-fallback');
+    } else {
+      const ctx = bgCanvas.getContext('2d');
+      let bgVideoEl = null;
+      let rafId = null;
+      let running = false;
 
-    // 等待页面完全加载后再加载视频，避免和关键资源抢带宽
-    function initBgVideo() {
-      // preload="metadata" 只加载了头部信息，这里触发完整播放
-      bgVideo.load();
-      const playPromise = bgVideo.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
+      // 调整 Canvas 内部分辨率
+      function resize() {
+        const dpr = window.innerWidth <= 768 ? 0.75 : 1;
+        bgCanvas.width  = window.innerWidth * dpr;
+        bgCanvas.height = window.innerHeight * dpr;
+      }
+
+      function draw() {
+        if (!running || !bgVideoEl) return;
+        try { ctx.drawImage(bgVideoEl, 0, 0, bgCanvas.width, bgCanvas.height); } catch(e) {}
+        rafId = requestAnimationFrame(draw);
+      }
+
+      function start() {
+        running = true;
+        draw();
+      }
+
+      function stop() {
+        running = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      }
+
+      function init() {
+        // 创建离屏 video（永远不插入 DOM）
+        bgVideoEl = document.createElement('video');
+        bgVideoEl.muted     = true;
+        bgVideoEl.loop      = true;
+        bgVideoEl.playsInline = true;
+        bgVideoEl.preload   = 'metadata';
+        bgVideoEl.src       = videoSrc;
+
+        bgVideoEl.addEventListener('loadeddata', () => {
+          resize();
+          bgVideoEl.play().then(() => {
+            start();
+            bgCanvas.style.opacity = '1';
+          }).catch(() => {
+            document.body.classList.add('bg-video-fallback');
+          });
+        });
+
+        bgVideoEl.addEventListener('error', () => {
           document.body.classList.add('bg-video-fallback');
         });
-      }
-    }
 
-    // 页面加载完成后再启动视频
-    if (document.readyState === 'complete') {
-      // 已经加载完了，稍微延迟避免立即抢带宽
-      setTimeout(initBgVideo, 500);
-    } else {
-      window.addEventListener('load', () => {
-        setTimeout(initBgVideo, 500);
+        bgVideoEl.load();
+      }
+
+      // 初始状态
+      bgCanvas.style.opacity = '0';
+      bgCanvas.style.transition = 'opacity 1.5s ease';
+      resize();
+
+      // 等页面加载完再启动，不抢首屏带宽
+      if (document.readyState === 'complete') {
+        setTimeout(init, 500);
+      } else {
+        window.addEventListener('load', () => setTimeout(init, 500));
+      }
+
+      // 窗口大小变化时更新画布
+      window.addEventListener('resize', resize);
+
+      // 切到后台暂停绘制，省电
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stop(); else start();
       });
     }
-
-    // 视频元数据就绪后淡入
-    bgVideo.addEventListener('loadeddata', () => {
-      bgVideo.style.opacity = '1';
-    });
-
-    // 视频加载失败降级
-    bgVideo.addEventListener('error', () => {
-      document.body.classList.add('bg-video-fallback');
-    });
   }
 
-  // 开发环境日志（生产环境可删除此行）
+  // 开发环境日志
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     console.log('%c🚀 Amorsum Theme %cLoaded', 'color: #7c5cff; font-weight: bold;', 'color: #9a9ab0;');
   }
