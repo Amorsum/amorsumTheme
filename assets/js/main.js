@@ -426,7 +426,21 @@
 
       function draw() {
         if (!running || !bgVideoEl) return;
-        try { ctx.drawImage(bgVideoEl, 0, 0, bgCanvas.width, bgCanvas.height); } catch(e) {}
+        try {
+          const vw = bgVideoEl.videoWidth;
+          const vh = bgVideoEl.videoHeight;
+          if (vw && vh) {
+            // object-fit: cover 逻辑 — 保持视频比例，填满画布，居中裁剪
+            const cw = bgCanvas.width;
+            const ch = bgCanvas.height;
+            const scale = Math.max(cw / vw, ch / vh);
+            const dw = vw * scale;
+            const dh = vh * scale;
+            const dx = (cw - dw) / 2;
+            const dy = (ch - dh) / 2;
+            ctx.drawImage(bgVideoEl, dx, dy, dw, dh);
+          }
+        } catch(e) {}
         rafId = requestAnimationFrame(draw);
       }
 
