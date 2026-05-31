@@ -15,8 +15,11 @@
     (function(){var t=localStorage.getItem('amorsum-theme');if(!t){var a=document.documentElement.getAttribute('data-theme');if(a==='auto'){t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else{t=a||'dark'}}if(t==='auto'){t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.setAttribute('data-theme',t)})()
     </script>
     <?php wp_head(); ?>
+    <?php if (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
+    <style>:root{--video-overlay-opacity:<?php echo floatval(intval(amorsum_theme('bg_video_opacity', 60)) / 100); ?>}</style>
+    <?php endif; ?>
 </head>
-<body <?php body_class(); ?>>
+<body <?php body_class(amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url') ? 'has-bg-video' : ''); ?>>
 
 <?php wp_body_open(); ?>
 
@@ -25,12 +28,23 @@
     <?php esc_html_e('跳至主内容', 'amorsum'); ?>
 </a>
 
+<?php if (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
+<!-- 背景动态视频 -->
+<video class="bg-video" autoplay muted loop playsinline disablePictureInPicture>
+    <source src="<?php echo esc_url(amorsum_theme('bg_video_url')); ?>" type="video/mp4">
+</video>
+<!-- 视频叠加层（保证文字可读性） -->
+<div class="bg-video-overlay"></div>
+<?php endif; ?>
+
+<?php if (amorsum_theme('show_bg_decor', true)): ?>
 <!-- 背景装饰 -->
 <div class="bg-decor">
     <div class="bg-decor__orb bg-decor__orb--1"></div>
     <div class="bg-decor__orb bg-decor__orb--2"></div>
     <div class="bg-decor__grid"></div>
 </div>
+<?php endif; ?>
 
 <div class="app">
 

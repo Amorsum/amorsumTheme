@@ -267,6 +267,59 @@ function amorsum_customize_register($wp_customize) {
         'section' => 'amorsum_footer',
         'type'    => 'textarea',
     ]);
+
+    // --- 背景设置 ---
+    $wp_customize->add_section('amorsum_background', [
+        'title'    => esc_html__('背景设置', 'amorsum'),
+        'priority' => 46,
+    ]);
+
+    // 背景视频开关
+    $wp_customize->add_setting('amorsum_bg_video_enable', [
+        'default'           => false,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ]);
+    $wp_customize->add_control('amorsum_bg_video_enable', [
+        'label'   => esc_html__('启用背景视频', 'amorsum'),
+        'section' => 'amorsum_background',
+        'type'    => 'checkbox',
+    ]);
+
+    // 背景视频 URL
+    $wp_customize->add_setting('amorsum_bg_video_url', [
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control('amorsum_bg_video_url', [
+        'label'       => esc_html__('背景视频地址', 'amorsum'),
+        'description' => esc_html__('上传 mp4/webm 到媒体库，粘贴文件地址。建议 1080p、10 秒以内循环片段。', 'amorsum'),
+        'section'     => 'amorsum_background',
+        'type'        => 'url',
+    ]);
+
+    // 视频叠加不透明度
+    $wp_customize->add_setting('amorsum_bg_video_opacity', [
+        'default'           => 60,
+        'sanitize_callback' => 'absint',
+    ]);
+    $wp_customize->add_control('amorsum_bg_video_opacity', [
+        'label'       => esc_html__('背景遮盖深度（%）', 'amorsum'),
+        'description' => esc_html__('数值越高，视频越暗/越模糊，文字越清晰。建议 40~80。', 'amorsum'),
+        'section'     => 'amorsum_background',
+        'type'        => 'range',
+        'input_attrs' => ['min' => 0, 'max' => 100, 'step' => 5],
+    ]);
+
+    // 显示/隐藏装饰元素
+    $wp_customize->add_setting('amorsum_show_bg_decor', [
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ]);
+    $wp_customize->add_control('amorsum_show_bg_decor', [
+        'label'   => esc_html__('显示背景装饰（光球 + 网格）', 'amorsum'),
+        'section' => 'amorsum_background',
+        'type'    => 'checkbox',
+    ]);
 }
 add_action('customize_register', 'amorsum_customize_register');
 
@@ -277,14 +330,18 @@ add_action('customize_register', 'amorsum_customize_register');
 // 获取主题设置值
 function amorsum_theme($setting, $default = null) {
     $defaults = [
-        'theme_mode'      => 'dark',
-        'home_layout'     => 'hero',
-        'hero_title'      => '["Hello, World.", "Welcome to Amorsum."]',
-        'hero_subtitle'   => 'Developer · Writer · Dreamer',
-        'show_toc'        => true,
-        'show_copyright'  => true,
-        'related_count'   => 3,
-        'footer_text'     => '',
+        'theme_mode'       => 'dark',
+        'home_layout'      => 'hero',
+        'hero_title'       => '["Hello, World.", "Welcome to Amorsum."]',
+        'hero_subtitle'    => 'Developer · Writer · Dreamer',
+        'show_toc'         => true,
+        'show_copyright'   => true,
+        'related_count'    => 3,
+        'footer_text'      => '',
+        'bg_video_enable'  => false,
+        'bg_video_url'     => '',
+        'bg_video_opacity' => 60,
+        'show_bg_decor'    => true,
     ];
     $default = $default ?? ($defaults[$setting] ?? '');
     return get_theme_mod('amorsum_' . $setting, $default);

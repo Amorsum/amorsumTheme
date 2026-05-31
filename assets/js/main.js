@@ -402,5 +402,36 @@
     }
   });
 
-  console.log('%c🚀 Amorsum Theme %cLoaded', 'color: #7c5cff; font-weight: bold;', 'color: #9a9ab0;');
+  // ============================================
+  // 12. 背景视频处理
+  // ============================================
+  const bgVideo = document.querySelector('.bg-video');
+
+  if (bgVideo) {
+    // 尝试播放（部分浏览器阻止不带用户交互的 autoplay）
+    const playPromise = bgVideo.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // autoplay 被阻止，静默降级为纯色背景
+        document.body.classList.add('bg-video-fallback');
+      });
+    }
+
+    // 视频加载失败降级
+    bgVideo.addEventListener('error', () => {
+      document.body.classList.add('bg-video-fallback');
+    });
+
+    // 视频成功加载后轻微淡入
+    bgVideo.addEventListener('loadeddata', () => {
+      bgVideo.style.opacity = '1';
+    });
+    bgVideo.style.transition = 'opacity 1.5s ease';
+    bgVideo.style.opacity = '0';
+  }
+
+  // 开发环境日志（生产环境可删除此行）
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('%c🚀 Amorsum Theme %cLoaded', 'color: #7c5cff; font-weight: bold;', 'color: #9a9ab0;');
+  }
 })();

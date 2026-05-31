@@ -293,6 +293,49 @@ button {
 }
 
 /* -------------------------------
+   4b. 视频背景
+   ------------------------------- */
+.bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bg-video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 深色 / 浅色下的叠加遮罩 */
+[data-theme="dark"] .bg-video-overlay {
+  background: rgba(8, 8, 15, var(--video-overlay-opacity, 0.6));
+}
+[data-theme="light"] .bg-video-overlay {
+  background: rgba(248, 248, 252, var(--video-overlay-opacity, 0.55));
+}
+
+/* 启用视频时移除 body 纯色背景 */
+body.has-bg-video {
+  background: transparent;
+}
+
+/* 视频加载失败时回退到正常背景 */
+body.has-bg-video.bg-video-fallback {
+  background: var(--bg-primary);
+}
+
+/* -------------------------------
    5. App 容器
    ------------------------------- */
 .app {
