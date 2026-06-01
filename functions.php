@@ -274,13 +274,25 @@ function amorsum_customize_register($wp_customize) {
         'priority' => 46,
     ]);
 
+    // 静态壁纸
+    $wp_customize->add_setting('amorsum_bg_image_url', [
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control('amorsum_bg_image_url', [
+        'label'       => esc_html__('静态壁纸地址', 'amorsum'),
+        'description' => esc_html__('纯 CSS 渲染，页面加载瞬间显示，切换页面无黑屏。会覆盖下方视频设置。', 'amorsum'),
+        'section'     => 'amorsum_background',
+        'type'        => 'url',
+    ]);
+
     // 背景视频开关
     $wp_customize->add_setting('amorsum_bg_video_enable', [
         'default'           => false,
         'sanitize_callback' => 'wp_validate_boolean',
     ]);
     $wp_customize->add_control('amorsum_bg_video_enable', [
-        'label'   => esc_html__('启用背景视频', 'amorsum'),
+        'label'   => esc_html__('启用背景视频（动态壁纸）', 'amorsum'),
         'section' => 'amorsum_background',
         'type'    => 'checkbox',
     ]);
@@ -350,9 +362,10 @@ function amorsum_theme($setting, $default = null) {
         'show_copyright'   => true,
         'related_count'    => 3,
         'footer_text'      => '',
-        'bg_video_enable'   => false,
-        'bg_video_url'      => '',
-        'bg_video_poster'   => '',
+        'bg_image_url'       => '',
+        'bg_video_enable'    => false,
+        'bg_video_url'       => '',
+        'bg_video_poster'    => '',
         'bg_video_opacity' => 60,
         'show_bg_decor'    => true,
     ];

@@ -294,7 +294,44 @@ button {
 }
 
 /* -------------------------------
-   4b. 视频背景
+   4b. 静态壁纸背景
+   ------------------------------- */
+.bg-static {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bg-static-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.has-bg-static {
+  background: transparent;
+}
+
+[data-theme="dark"] .bg-static-overlay {
+  background: rgba(8, 8, 15, var(--video-overlay-opacity, 0.6));
+}
+[data-theme="light"] .bg-static-overlay {
+  background: rgba(248, 248, 252, var(--video-overlay-opacity, 0.3));
+}
+
+/* -------------------------------
+   4c. 视频背景
    ------------------------------- */
 .bg-video {
   position: fixed;

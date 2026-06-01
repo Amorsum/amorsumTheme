@@ -16,11 +16,15 @@
     (function(){var t=localStorage.getItem('amorsum-theme');if(!t){var a=document.documentElement.getAttribute('data-theme');if(a==='auto'){t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else{t=a||'dark'}}if(t==='auto'){t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.setAttribute('data-theme',t)})()
     </script>
     <?php wp_head(); ?>
-    <?php if (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
+    <?php
+    $bg_image = amorsum_theme('bg_image_url', '');
+    $has_bg   = !empty($bg_image) || (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url'));
+    if ($has_bg):
+    ?>
     <style>:root{--video-overlay-opacity:<?php echo floatval(intval(amorsum_theme('bg_video_opacity', 60)) / 100); ?>}</style>
     <?php endif; ?>
 </head>
-<body <?php body_class(amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url') ? 'has-bg-video' : ''); ?>>
+<body <?php body_class(!empty($bg_image) ? 'has-bg-static' : (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url') ? 'has-bg-video' : '')); ?>>
 
 <?php wp_body_open(); ?>
 
@@ -29,7 +33,14 @@
     <?php esc_html_e('跳至主内容', 'amorsum'); ?>
 </a>
 
-<?php if (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
+<?php
+$bg_image = amorsum_theme('bg_image_url', '');
+if (!empty($bg_image)):
+    // 静态壁纸 — 纯 CSS，零延迟，页面切换无黑屏
+?>
+<div class="bg-static" style="background-image:url(<?php echo esc_url($bg_image); ?>)"></div>
+<div class="bg-static-overlay"></div>
+<?php elseif (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
 <!-- 背景动态壁纸（Canvas 渲染，浏览器不会识别为视频） -->
 <?php $poster = amorsum_theme('bg_video_poster', ''); ?>
 <canvas class="bg-video" id="bgCanvas" data-src="<?php echo esc_url(amorsum_theme('bg_video_url')); ?>"<?php if ($poster): ?> data-poster="<?php echo esc_url($poster); ?>" style="background-image:url(<?php echo esc_url($poster); ?>);background-size:cover;background-position:center"<?php endif; ?>></canvas>
