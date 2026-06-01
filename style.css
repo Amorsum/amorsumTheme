@@ -2163,22 +2163,37 @@ body.has-bg-video.bg-video-fallback {
 /* -------------------------------
    24b. 页面切换滑动过渡
    ------------------------------- */
-/* 离开动画：当前页面滑出 */
+/* 前进 — 向左滑出 */
 .app__main--leaving {
-  animation: page-leave 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+  animation: page-leave-left 0.2s cubic-bezier(0.4, 0, 1, 1) both;
 }
-/* 进入动画：新页面滑入 */
+/* 前进 — 从右侧滑入 */
 .app__main--entering {
-  animation: page-enter 0.35s cubic-bezier(0, 0, 0.2, 1) both;
+  animation: page-enter-right 0.35s cubic-bezier(0, 0, 0.2, 1) both;
+}
+/* 后退 — 向右滑出 */
+.app__main--leaving-back {
+  animation: page-leave-right 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+}
+/* 后退 — 从左侧滑入 */
+.app__main--entering-back {
+  animation: page-enter-left 0.35s cubic-bezier(0, 0, 0.2, 1) both;
 }
 
-@keyframes page-leave {
+@keyframes page-leave-left {
   from { transform: translateX(0); opacity: 1; }
   to   { transform: translateX(-50px); opacity: 0; }
 }
-
-@keyframes page-enter {
+@keyframes page-enter-right {
   from { transform: translateX(50px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes page-leave-right {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(50px); opacity: 0; }
+}
+@keyframes page-enter-left {
+  from { transform: translateX(-50px); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }
 

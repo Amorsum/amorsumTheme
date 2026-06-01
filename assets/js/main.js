@@ -502,28 +502,40 @@
   }
 
   // ============================================
-  // 13. 页面切换滑动过渡
+  // 13. 页面切换滑动过渡（根据页面层级判断方向）
   // ============================================
   const appMain = document.querySelector('.app__main');
 
-  // 进入动画：仅当从内部链接跳转过来时播放
+  // 计算页面路径深度：首页=0, 归档=1, 分类=2, 关于=3, 文章/其他=路径段数+3
+  function getPageDepth(pathname) {
+    var p = pathname.replace(/^\/index\.php/, '').replace(/\/$/, '') || '/';
+    var map = { '/': 0, '/archives': 1, '/categories': 2, '/about': 3 };
+    if (map[p] !== undefined) return map[p];
+    return p.split('/').filter(Boolean).length + 3;
+  }
+
+  // 进入动画：从内部链接跳转过来时播放
   if (appMain && sessionStorage.getItem('amorsum-transition') === 'slide') {
+    var dir = sessionStorage.getItem('amorsum-direction') || 'forward';
     sessionStorage.removeItem('amorsum-transition');
-    appMain.classList.add('app__main--entering');
+    sessionStorage.removeItem('amorsum-direction');
+    var enterClass = dir === 'back' ? 'app__main--entering-back' : 'app__main--entering';
+    appMain.classList.add(enterClass);
     appMain.addEventListener('animationend', function () {
-      appMain.classList.remove('app__main--entering');
+      appMain.classList.remove(enterClass);
     }, { once: true });
   }
 
-  // 浏览器回退时清除残留，不做动画
+  // 浏览器回退时清除残留
   window.addEventListener('pageshow', function (e) {
     if (e.persisted) {
       sessionStorage.removeItem('amorsum-transition');
-      if (appMain) appMain.classList.remove('app__main--entering', 'app__main--leaving');
+      sessionStorage.removeItem('amorsum-direction');
+      if (appMain) appMain.classList.remove('app__main--entering', 'app__main--entering-back', 'app__main--leaving', 'app__main--leaving-back');
     }
   });
 
-  // 拦截内部链接点击，先滑出再跳转
+  // 拦截内部链接点击
   document.addEventListener('click', function (e) {
     var link = e.target.closest('a');
     if (!link) return;
@@ -532,26 +544,32 @@
     if (!href || href.charAt(0) === '#' || href.indexOf('javascript:') === 0) return;
     if (link.getAttribute('target') === '_blank') return;
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-
-    // 排除搜索面板内的链接（它们有自己的关闭逻辑）
     if (e.target.closest('#searchPanel')) return;
 
-    // 只拦截同域名链接
-    var linkHost;
-    try { linkHost = (new URL(href, window.location.origin)).host; } catch(ex) { return; }
+    var linkHost, targetPath;
+    try {
+      var url = new URL(href, window.location.origin);
+      linkHost = url.host;
+      targetPath = url.pathname;
+    } catch(ex) { return; }
     if (linkHost !== window.location.host) return;
-    // 排除 wp-admin
     if (href.indexOf('wp-admin') !== -1 || href.indexOf('wp-login') !== -1) return;
 
     e.preventDefault();
 
+    // 判断方向：目标更深 → forward(向左滑)，目标更浅 → back(向右滑)
+    var fromDepth = getPageDepth(window.location.pathname);
+    var toDepth   = getPageDepth(targetPath);
+    var isBack    = toDepth < fromDepth;
+
     if (appMain) {
-      appMain.classList.add('app__main--leaving');
+      var leaveClass = isBack ? 'app__main--leaving-back' : 'app__main--leaving';
+      appMain.classList.add(leaveClass);
       sessionStorage.setItem('amorsum-transition', 'slide');
+      sessionStorage.setItem('amorsum-direction', isBack ? 'back' : 'forward');
 
       var go = function () { window.location = href; };
       appMain.addEventListener('animationend', go, { once: true });
-      // 兜底：300ms 后强制跳转，防止动画事件未触发
       setTimeout(function () {
         if (sessionStorage.getItem('amorsum-transition') === 'slide') {
           go();
