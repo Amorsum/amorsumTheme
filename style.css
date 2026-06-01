@@ -294,28 +294,15 @@ button {
 }
 
 /* -------------------------------
-   4b. 静态壁纸背景（body 伪元素，全设备兼容）
+   4b. 静态壁纸背景
    ------------------------------- */
+/* 壁纸直接设于 body — CSS 最底层机制，全设备兼容 */
 body.has-bg-static {
-  background: var(--bg-primary); /* 兜底，图片加载前不露白 */
+  background-color: var(--bg-primary); /* 兜底底色 */
+  background-attachment: scroll;
 }
 
-/* 壁纸层 */
-body.has-bg-static::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  height: 100dvh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  pointer-events: none;
-}
-
-/* 叠加层 */
+/* 叠加层（保证文字可读性） */
 body.has-bg-static::after {
   content: '';
   position: fixed;

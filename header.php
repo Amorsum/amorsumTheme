@@ -24,7 +24,7 @@
     ?>
     <style>
         :root{--video-overlay-opacity:<?php echo $opacity; ?>}
-        <?php if (!empty($bg_image)): ?>body.has-bg-static::before{background-image:url(<?php echo esc_url($bg_image); ?>)}<?php endif; ?>
+        <?php if (!empty($bg_image)): ?>body.has-bg-static{background-image:url(<?php echo esc_url($bg_image); ?>);background-size:cover;background-position:center;background-repeat:no-repeat}<?php endif; ?>
     </style>
     <?php endif; ?>
 </head>
