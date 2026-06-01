@@ -24,7 +24,10 @@
     ?>
     <style>
         :root{--video-overlay-opacity:<?php echo $opacity; ?>}
-        <?php if (!empty($bg_image)): ?>body.has-bg-static{background-image:url(<?php echo esc_url($bg_image); ?>);background-size:cover;background-position:center;background-repeat:no-repeat}<?php endif; ?>
+        <?php if (!empty($bg_image)): ?>
+        body.has-bg-static{background-image:url(<?php echo esc_url($bg_image); ?>);background-size:cover;background-repeat:no-repeat}
+        :root{--bg-position-mobile:<?php echo intval(amorsum_theme('bg_position_mobile', 50)); ?>%}
+        <?php endif; ?>
     </style>
     <?php endif; ?>
 </head>

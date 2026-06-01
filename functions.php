@@ -286,6 +286,19 @@ function amorsum_customize_register($wp_customize) {
         'type'        => 'url',
     ]);
 
+    // 移动端壁纸水平位置
+    $wp_customize->add_setting('amorsum_bg_position_mobile', [
+        'default'           => 50,
+        'sanitize_callback' => 'absint',
+    ]);
+    $wp_customize->add_control('amorsum_bg_position_mobile', [
+        'label'       => esc_html__('移动端壁纸水平偏移（%）', 'amorsum'),
+        'description' => esc_html__('0=最左，50=居中（默认），100=最右。用于手机竖屏时调整壁纸焦点。', 'amorsum'),
+        'section'     => 'amorsum_background',
+        'type'        => 'range',
+        'input_attrs' => ['min' => 0, 'max' => 100, 'step' => 5],
+    ]);
+
     // 背景视频开关
     $wp_customize->add_setting('amorsum_bg_video_enable', [
         'default'           => false,
@@ -362,8 +375,9 @@ function amorsum_theme($setting, $default = null) {
         'show_copyright'   => true,
         'related_count'    => 3,
         'footer_text'      => '',
-        'bg_image_url'       => '',
-        'bg_video_enable'    => false,
+        'bg_image_url'           => '',
+        'bg_position_mobile'     => 50,
+        'bg_video_enable'        => false,
         'bg_video_url'       => '',
         'bg_video_poster'    => '',
         'bg_video_opacity' => 60,

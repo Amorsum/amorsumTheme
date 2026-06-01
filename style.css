@@ -300,6 +300,14 @@ button {
 body.has-bg-static {
   background-color: var(--bg-primary); /* 兜底底色 */
   background-attachment: scroll;
+  background-position: center;
+}
+
+/* 手机端可独立调整壁纸水平焦点 */
+@media (max-width: 768px) {
+  body.has-bg-static {
+    background-position: var(--bg-position-mobile, 50%) top;
+  }
 }
 
 /* 叠加层（保证文字可读性） */
