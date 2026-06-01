@@ -577,6 +577,54 @@
     }
   });
 
+  // ============================================
+  // 14. 导航链接预加载（悬停即拉取，点击瞬开）
+  // ============================================
+  (function () {
+    var prefetched = {};
+    var prefetchTimer = null;
+
+    function prefetch(url) {
+      if (!url || prefetched[url]) return;
+      prefetched[url] = true;
+      var link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      link.as = 'document';
+      document.head.appendChild(link);
+    }
+
+    document.addEventListener('mouseover', function (e) {
+      var link = e.target.closest('a');
+      if (!link) return;
+      var href = link.getAttribute('href');
+      if (!href || href.charAt(0) === '#' || href.indexOf('javascript:') === 0) return;
+      if (link.getAttribute('target') === '_blank') return;
+      if (e.target.closest('#searchPanel')) return;
+      try {
+        if ((new URL(href, window.location.origin)).host !== window.location.host) return;
+      } catch(ex) { return; }
+
+      // 悬停 80ms 后触发预加载（避免扫过菜单也触发）
+      clearTimeout(prefetchTimer);
+      var url = href;
+      prefetchTimer = setTimeout(function () { prefetch(url); }, 80);
+    }, { passive: true });
+
+    // 手指触摸时立刻预加载（移动端）
+    document.addEventListener('touchstart', function (e) {
+      var link = e.target.closest('a');
+      if (!link) return;
+      var href = link.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      if (link.getAttribute('target') === '_blank') return;
+      try {
+        if ((new URL(href, window.location.origin)).host !== window.location.host) return;
+      } catch(ex) { return; }
+      prefetch(href);
+    }, { passive: true });
+  })();
+
   // 开发环境日志
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     console.log('%c🚀 Amorsum Theme %cLoaded', 'color: #7c5cff; font-weight: bold;', 'color: #9a9ab0;');
