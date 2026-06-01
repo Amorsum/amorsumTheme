@@ -2161,33 +2161,26 @@ body.has-bg-video.bg-video-fallback {
 .post-card:nth-child(6) { transition-delay: 400ms; }
 
 /* -------------------------------
-   24b. 页面切换过渡 (View Transitions API)
+   24b. 页面切换滑动过渡
    ------------------------------- */
-/* CSS 层面启用跨页面过渡，和 meta 标签互补 */
-@view-transition {
-  navigation: auto;
+/* 离开动画：当前页面滑出 */
+.app__main--leaving {
+  animation: page-leave 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+}
+/* 进入动画：新页面滑入 */
+.app__main--entering {
+  animation: page-enter 0.35s cubic-bezier(0, 0, 0.2, 1) both;
 }
 
-/* 旧页面向左滑出 */
-::view-transition-old(root) {
-  animation: page-slide-out 0.45s cubic-bezier(0.32, 0, 0.67, 0) both;
-}
-/* 新页面从右侧滑入 */
-::view-transition-new(root) {
-  animation: page-slide-in 0.45s cubic-bezier(0.33, 1, 0.68, 1) both;
-}
-
-@keyframes page-slide-out {
+@keyframes page-leave {
   from { transform: translateX(0); opacity: 1; }
-  to   { transform: translateX(-40%); opacity: 0; }
+  to   { transform: translateX(-50px); opacity: 0; }
 }
 
-@keyframes page-slide-in {
-  from { transform: translateX(40%); opacity: 0; }
+@keyframes page-enter {
+  from { transform: translateX(50px); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
 }
-
-/* 不支持 View Transitions 的浏览器不做任何处理 */
 
 /* -------------------------------
    25. 代码复制按钮（JS 注入）

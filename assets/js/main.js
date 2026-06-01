@@ -501,6 +501,67 @@
     }
   }
 
+  // ============================================
+  // 13. 页面切换滑动过渡
+  // ============================================
+  const appMain = document.querySelector('.app__main');
+
+  // 进入动画：仅当从内部链接跳转过来时播放
+  if (appMain && sessionStorage.getItem('amorsum-transition') === 'slide') {
+    sessionStorage.removeItem('amorsum-transition');
+    appMain.classList.add('app__main--entering');
+    appMain.addEventListener('animationend', function () {
+      appMain.classList.remove('app__main--entering');
+    }, { once: true });
+  }
+
+  // 浏览器回退时清除残留，不做动画
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+      sessionStorage.removeItem('amorsum-transition');
+      if (appMain) appMain.classList.remove('app__main--entering', 'app__main--leaving');
+    }
+  });
+
+  // 拦截内部链接点击，先滑出再跳转
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest('a');
+    if (!link) return;
+
+    var href = link.getAttribute('href');
+    if (!href || href.charAt(0) === '#' || href.indexOf('javascript:') === 0) return;
+    if (link.getAttribute('target') === '_blank') return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+
+    // 排除搜索面板内的链接（它们有自己的关闭逻辑）
+    if (e.target.closest('#searchPanel')) return;
+
+    // 只拦截同域名链接
+    var linkHost;
+    try { linkHost = (new URL(href, window.location.origin)).host; } catch(ex) { return; }
+    if (linkHost !== window.location.host) return;
+    // 排除 wp-admin
+    if (href.indexOf('wp-admin') !== -1 || href.indexOf('wp-login') !== -1) return;
+
+    e.preventDefault();
+
+    if (appMain) {
+      appMain.classList.add('app__main--leaving');
+      sessionStorage.setItem('amorsum-transition', 'slide');
+
+      var go = function () { window.location = href; };
+      appMain.addEventListener('animationend', go, { once: true });
+      // 兜底：300ms 后强制跳转，防止动画事件未触发
+      setTimeout(function () {
+        if (sessionStorage.getItem('amorsum-transition') === 'slide') {
+          go();
+        }
+      }, 300);
+    } else {
+      window.location = href;
+    }
+  });
+
   // 开发环境日志
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     console.log('%c🚀 Amorsum Theme %cLoaded', 'color: #7c5cff; font-weight: bold;', 'color: #9a9ab0;');
