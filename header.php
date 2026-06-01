@@ -20,8 +20,12 @@
     $bg_image = amorsum_theme('bg_image_url', '');
     $has_bg   = !empty($bg_image) || (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url'));
     if ($has_bg):
+        $opacity = floatval(intval(amorsum_theme('bg_video_opacity', 60)) / 100);
     ?>
-    <style>:root{--video-overlay-opacity:<?php echo floatval(intval(amorsum_theme('bg_video_opacity', 60)) / 100); ?>}</style>
+    <style>
+        :root{--video-overlay-opacity:<?php echo $opacity; ?>}
+        <?php if (!empty($bg_image)): ?>body.has-bg-static::before{background-image:url(<?php echo esc_url($bg_image); ?>)}<?php endif; ?>
+    </style>
     <?php endif; ?>
 </head>
 <body <?php body_class(!empty($bg_image) ? 'has-bg-static' : (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url') ? 'has-bg-video' : '')); ?>>
@@ -36,10 +40,8 @@
 <?php
 $bg_image = amorsum_theme('bg_image_url', '');
 if (!empty($bg_image)):
-    // 静态壁纸 — 纯 CSS，零延迟，页面切换无黑屏
+    // 静态壁纸 — 通过 CSS 变量挂到 body::before，全设备通用
 ?>
-<div class="bg-static" style="background-image:url(<?php echo esc_url($bg_image); ?>)"></div>
-<div class="bg-static-overlay"></div>
 <?php elseif (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
 <!-- 背景动态壁纸（Canvas 渲染，浏览器不会识别为视频） -->
 <?php $poster = amorsum_theme('bg_video_poster', ''); ?>
