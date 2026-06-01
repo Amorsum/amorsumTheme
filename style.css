@@ -2161,6 +2161,42 @@ body.has-bg-video.bg-video-fallback {
 .post-card:nth-child(6) { transition-delay: 400ms; }
 
 /* -------------------------------
+   24b. 页面切换过渡 (View Transitions API)
+   ------------------------------- */
+/* 旧页面向左滑出 */
+::view-transition-old(root) {
+  animation: page-slide-out 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+/* 新页面从右侧滑入 */
+::view-transition-new(root) {
+  animation: page-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes page-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-25%);
+    opacity: 0;
+  }
+}
+
+@keyframes page-slide-in {
+  from {
+    transform: translateX(25%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 不支持 View Transitions 的浏览器不做任何处理 */
+
+/* -------------------------------
    25. 代码复制按钮（JS 注入）
    ------------------------------- */
 .code-copy-btn {
