@@ -31,7 +31,8 @@
 
 <?php if (amorsum_theme('bg_video_enable') && amorsum_theme('bg_video_url')): ?>
 <!-- 背景动态壁纸（Canvas 渲染，浏览器不会识别为视频） -->
-<canvas class="bg-video" id="bgCanvas" data-src="<?php echo esc_url(amorsum_theme('bg_video_url')); ?>"></canvas>
+<?php $poster = amorsum_theme('bg_video_poster', ''); ?>
+<canvas class="bg-video" id="bgCanvas" data-src="<?php echo esc_url(amorsum_theme('bg_video_url')); ?>"<?php if ($poster): ?> data-poster="<?php echo esc_url($poster); ?>" style="background-image:url(<?php echo esc_url($poster); ?>);background-size:cover;background-position:center"<?php endif; ?>></canvas>
 <!-- 视频叠加层（保证文字可读性） -->
 <div class="bg-video-overlay"></div>
 <?php endif; ?>

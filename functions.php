@@ -297,6 +297,18 @@ function amorsum_customize_register($wp_customize) {
         'type'        => 'url',
     ]);
 
+    // 背景海报图（视频加载前的静态占位图）
+    $wp_customize->add_setting('amorsum_bg_video_poster', [
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control('amorsum_bg_video_poster', [
+        'label'       => esc_html__('背景海报图（可选）', 'amorsum'),
+        'description' => esc_html__('视频加载前显示的静态图片，避免黑屏。建议截取视频一帧作为海报。', 'amorsum'),
+        'section'     => 'amorsum_background',
+        'type'        => 'url',
+    ]);
+
     // 视频叠加不透明度
     $wp_customize->add_setting('amorsum_bg_video_opacity', [
         'default'           => 60,
@@ -338,8 +350,9 @@ function amorsum_theme($setting, $default = null) {
         'show_copyright'   => true,
         'related_count'    => 3,
         'footer_text'      => '',
-        'bg_video_enable'  => false,
-        'bg_video_url'     => '',
+        'bg_video_enable'   => false,
+        'bg_video_url'      => '',
+        'bg_video_poster'   => '',
         'bg_video_opacity' => 60,
         'show_bg_decor'    => true,
     ];

@@ -465,8 +465,7 @@
         bgVideoEl.addEventListener('loadeddata', () => {
           resize();
           bgVideoEl.play().then(() => {
-            start();
-            bgCanvas.style.opacity = '1';
+            start(); // 首帧直接覆盖海报/底色，无淡入延迟
           }).catch(() => {
             document.body.classList.add('bg-video-fallback');
           });
@@ -479,9 +478,7 @@
         bgVideoEl.load();
       }
 
-      // 初始状态
-      bgCanvas.style.opacity = '0';
-      bgCanvas.style.transition = 'opacity 1.5s ease';
+      // Canvas 始终可见，海报图或深色底立刻显示
       resize();
 
       // 等页面加载完再启动，不抢首屏带宽
